@@ -1,0 +1,33 @@
+#!/bin/bash
+
+CTRLDIR=~/cicd-template
+
+deploy_kind="Deployment"
+lists=`cat ${CTRLDIR}/deploy/deploy.yaml | grep "kind: " | cut -d ":" -f2 | tr -d " "`
+for kind in ${lists}
+do
+  if [[ "${kind}" =~ "StatefulSet" ]]; then
+    deploy_kind=StatefulSet
+    break
+  fi
+done
+
+echo "${deploy_kind}"
+
+
+# check current version
+echo "STEP4. Delete application if same version exists "
+
+CURTAG=$(kubectl get ${deploy_kind} ${image_repository} -o yaml 2> /dev/null | grep "image: ${image_registry}/${image_project}/${image_repository}:" | cut -d ':' -f3)
+echo "FIND CURRENT VERSION: ${CURTAG}"
+
+echo "deploy kind: ${deploy_kind}, version: ${CURTAG} -> ${image_tag}"
+
+# 동일한 서비스의 동일한 버전이 있으면 변경내용 반영위해 기존 deployment 삭제
+if [ $? -eq 0 ] && [ "${CURTAG}" == "${image_tag}" ]; then
+    echo "[${image_repository}] Same version(${image_tag}) service exists!"
+
+    kubectl delete ${deploy_kind} --selector="app=${image_repository}"
+fi
+echo ""
+

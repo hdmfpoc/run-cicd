@@ -85,8 +85,8 @@ deploy_kind="Deployment"
 lists=`cat ${CTRLDIR}/deploy/deploy.yaml | grep "kind: " | cut -d ":" -f2 | tr -d " "`
 for kind in ${lists}
 do
-  if [[ "${kind}" =~ "Deployment" ]] || [[ "${kind}" =~ "StatefulSet" ]]; then
-    deploy_kind=${kind}
+  if [[ "${kind}" =~ "StatefulSet" ]]; then
+    deploy_kind=StatefulSet
     break
   fi
 done
