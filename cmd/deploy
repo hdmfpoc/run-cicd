@@ -124,6 +124,8 @@ fi
 echo ""
 
 # configmap revise
+mkdir -p ${basedir}/deploy
+
 echo "STEP5. Create ConfigMap "
 
 cm="${image_repository}-cm"
