@@ -64,16 +64,17 @@ fi
 
 # get namespace
 file1=""
-if [ -f ${basedir}/cicd/cicd.properties ]; then
+if [ -f ${basedir}/deploy/cicd.properties ]; then  # use config server 
   file1=cicd.properties
+  ns=`cat ${basedir}/deploy/${file1} | grep namespace= | cut -d "=" -f 2`
 elif [ -f ${basedir}/cicd/cicd-common.properties ]; then
   file1=cicd-common.properties
+  ns=`cat ${basedir}/cicd/${file1} | grep namespace= | cut -d "=" -f 2`
 fi
 if [ "${file1}" == "" ]; then
   echo "CAN'T FIND cicd properties file"
   exit 1
 fi
-ns=`cat ${basedir}/cicd/${file1} | grep namespace= | cut -d "=" -f 2`
 echo "NAMESPACE=>${ns}"
 if [ "${ns}" == "" ]; then
   echo "CAN'T FIND namespace in ${file1}"
@@ -94,10 +95,10 @@ echo ""
 
 # set variables from config.properties: converted from '.' to '_'
 echo "STEP2. Set environment variables "
-if [ -f ${basedir}/cicd/cicd-common.properties ]; then
+if [ -f ${basedir}/cicd/cicd-common.properties ]; then  #NOT use config server 
   eval $(${CTRLDIR}/cmd/set-env ${basedir}/cicd/cicd-common.properties)
 else
-  eval $(${CTRLDIR}/cmd/set-env ${basedir}/cicd/cicd.properties)
+  eval $(${CTRLDIR}/cmd/set-env ${basedir}/deploy/cicd.properties)
 fi
 
 # switch kubenetes context
@@ -124,12 +125,12 @@ echo ""
 echo "STEP5. Create ConfigMap "
 
 cm="${image_repository}-cm"
-filepath=${basedir}/cicd/cm-converted.properties
-tmp=${basedir}/cicd/tmp.env
+filepath=${basedir}/deploy/cm-converted.properties
+tmp=${basedir}/deploy/tmp.env
 # 현재 배포 대상 profile에 맞는 변수 셋팅을 위해 _dev또는 _prod붙어 있는 변수에서 _dev또는_prod를 제거함
 # 예) mq_host_dev => mq_host
-if [ -f ${basedir}/cicd/cm.properties ]; then
-  sed "s@_${profile}=@=@g" ${basedir}/cicd/cm.properties > ${filepath}
+if [ -f ${basedir}/deploy/cm.properties ]; then  # use config server 
+  sed "s@_${profile}=@=@g" ${basedir}/deploy/cm.properties > ${filepath}
   cp ${filepath} ${tmp}
 else
   echo "" > ${tmp}
@@ -138,8 +139,8 @@ fi
 if [ -f ${basedir}/cicd/cm-common.env ]; then
   cat ${basedir}/cicd/cm-common.env >> ${tmp}
 fi
-if [ -f ${basedir}/cicd/cm-${profile}.env ]; then
-    cat ${basedir}/cicd/cm-${profile}.env >> ${tmp}
+if [ -f ${basedir}/deploy/cm-${profile}.env ]; then
+    cat ${basedir}/deploy/cm-${profile}.env >> ${tmp}
 fi
 sort -u ${tmp} > ${filepath}
 
@@ -152,10 +153,10 @@ echo ""
 echo "STEP6. Create Secret "
 
 secret="${image_repository}-secret"
-filepath=${basedir}/cicd/secret-converted.properties
-tmp=${basedir}/cicd/tmp.env
-if [ -f ${basedir}/cicd/secret.properties ]; then
-  sed "s@_${profile}=@=@g" ${basedir}/cicd/secret.properties > ${filepath}
+filepath=${basedir}/deploy/secret-converted.properties
+tmp=${basedir}/deploy/tmp.env
+if [ -f ${basedir}/deploy/secret.properties ]; then
+  sed "s@_${profile}=@=@g" ${basedir}/deploy/secret.properties > ${filepath}
   cp ${filepath} ${tmp}
 else
   echo "" > ${tmp}
@@ -164,8 +165,8 @@ fi
 if [ -f ${basedir}/cicd/secret-common.env ]; then
   cat ${basedir}/cicd/secret-common.env >> ${tmp}
 fi
-if [ -f ${basedir}/cicd/secret-${profile}.env ]; then
-    cat ${basedir}/cicd/secret-${profile}.env >> ${tmp}
+if [ -f ${basedir}/deploy/secret-${profile}.env ]; then
+    cat ${basedir}/deploy/secret-${profile}.env >> ${tmp}
 fi
 sort -u ${tmp} > ${filepath}
 
@@ -180,8 +181,8 @@ echo "STEP7. Deploy application "
 IMG="${image_registry}\/${image_project}\/${image_repository}:${image_tag}"
 
 #Mac과 linux 모두에서 동작하기 위해 workaround적용
-yaml=${basedir}/cicd/deploy.yaml
-tmp=${basedir}/cicd/tmp.yaml
+yaml=${basedir}/deploy/deploy.yaml
+tmp=${basedir}/deploy/tmp.yaml
 cp ${CTRLDIR}/deploy/deploy.yaml ${yaml}
 sed "s@{{ SERVICE_NAME }}@${image_repository}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ NAMESPACE }}@${namespace}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
@@ -197,10 +198,10 @@ sed "s@{{ REQ_CPU }}@${req_cpu}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ REQ_MEM }}@${req_mem}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ LIMIT_CPU }}@${limit_cpu}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ LIMIT_MEM }}@${limit_mem}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
-sed "s@{{ SERVICE_HOST }}@${service_host}@g" ${yaml} > ${basedir}/cicd/deploy-converted.yaml
+sed "s@{{ SERVICE_HOST }}@${service_host}@g" ${yaml} > ${basedir}/deploy/deploy-converted.yaml
 
 if [ $? -eq 0 ]; then
-    kubectl apply -f ${basedir}/cicd/deploy-converted.yaml
+    kubectl apply -f ${basedir}/deploy/deploy-converted.yaml
 else
     echo "******** FAIL to convert deployment yaml !!! ******** "
 fi
