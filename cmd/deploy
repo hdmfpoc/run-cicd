@@ -210,6 +210,7 @@ else
     echo "******** FAIL to convert deployment yaml !!! ******** "
 fi
 
+rm -rf ${basedir}/deploy 2>/dev/null
 
 echo ""
 echo "************* END DEPLOY service *****************"
