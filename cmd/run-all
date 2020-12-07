@@ -1,0 +1,52 @@
+#!/bin/bash
+CTRLDIR=~/cicd-template
+echo "************** RUN ALL ***************"
+echo ""
+
+# get parameters
+if ([ $# -lt 6 ]) || ([ $# -eq 1 ] && [ "$1" == "-h" -o "$1" == "--help" ]); then
+  echo "run-all <reg username> <reg password> <k8s-context> <profile> <root directory> <config server>"
+  echo " reg username: container image registry username "
+  echo " reg password: container image registry password "
+  echo " k8s-context: 사용할 k8s context명. kubectl config view로 context 목록 확인. '.'은 현재 컨텍스트 의미함 "
+  echo " profile: 배포대상 환경 프로파일(ex:dev, prod)" 
+  echo " root directory: project의 최상위 디렉토리. '.'은 현재 디렉토리 의미함. "
+  echo " dev lang: 개발 언어 (java, nodejs)"
+  echo " config server: config server의 ingress 이름(optional)" 
+  echo " ex) ./run-all user1 password1 kubernetes-admin@kubernetes prod ~/work java config-server"
+  echo " ex) ./run-all user1 password1 . prod . nodejs "
+  exit 1
+fi
+
+username=$1
+password=$2
+context=$3
+profile=$4
+basedir=$5
+devlang=$6
+configserver=$7
+echo "configserver=>${configserver}"
+
+if [ $# -eq 6 ] || [ "${configserver}" == "" ]; then
+  echo "NOT using config-server"
+else
+  # read only cicd related configuration
+  ${CTRLDIR}/cmd/read-config ${profile} ${basedir} cicd ${configserver}
+  if [ $? -eq 1 ]; then exit 1; fi
+
+  # read configuration
+  ${CTRLDIR}/cmd/read-config ${profile} ${basedir} cm,secret ${configserver}
+  if [ $? -eq 1 ]; then exit 1; fi
+fi 
+
+# build & push
+${CTRLDIR}/cmd/build-image ${username} ${password} ${basedir} ${devlang}
+if [ $? -eq 1 ]; then exit 1; fi
+
+# deploy
+${CTRLDIR}/cmd/deploy ${context} ${profile} ${basedir}
+if [ $? -eq 1 ]; then exit 1; fi
+
+echo ""
+echo "************** END ALL ***************"
+exit 0

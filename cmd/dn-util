@@ -1,0 +1,84 @@
+#!/bin/bash
+#VERSION:1.0
+
+# get parameters
+if ([ $# -lt 4 ]) || ([ $# -eq 1 ] && [ "$1" == "-h" -o "$1" == "--help" ]); then
+  echo "dn-utils <fileuri> <target directory> <executable> <root dir>"
+  echo " fileuri: download file uri. you can define multiple files using comma. "
+  echo " target directory: download location "
+  echo " executable: make it executable file or not  "
+  echo " root dir: top directory "
+  echo " ex) ./dn-utils cmd/deploy,cmd/deploy-with-config ./cicd/cmd 1 ~/work"
+  echo " ex) ./dn-utils deploy.yaml ./cicd 0 ."
+  exit 1
+fi
+
+fileuri=$1
+targetdir=$2
+executable=$3
+basedir=$4
+
+# set download url 환경변수
+DOWNLOAD_URI=`grep "DOWNLOAD_URI=" ${basedir}/cicd/cmd/url.ini | cut -d "=" -f 2`
+
+function dnFile() {
+
+    echo "Donwload file: ${uri} to ${targetdir}/${fn}"
+
+    url=${DOWNLOAD_URI}/${uri}
+
+        mkdir -p ${targetdir} 2> /dev/null
+
+      wget -O ${targetdir}/${fn} ${url}
+      if [ $? -eq 1 ]; then
+            echo "Fail to downloade: ${url}"
+            return 1
+      fi
+
+    if [ ${executable} -eq 1 ]; then chmod +x ${targetdir}/${fn}; fi
+    return 0
+}
+
+fn=""
+uri=""
+ver_local=""
+ver_server=""
+
+# split files
+IFS="," read -a files <<< "${fileuri}"
+
+for ((i=0;i<${#files[@]};i++))
+do
+    uri=${files[i]}
+
+    if [[ "${uri}" =~ "/" ]]; then
+          IFS="/" read -a lists <<< "${uri}"
+          len=${#lists[@]}
+          fn=${lists[$len-1]}
+    else
+          fn=${fileuri}
+    fi
+
+    if [ "${fn}" == "version.ini" ]; then
+        echo "${targetdir}/${fn} => START download version file"
+        dnFile
+    elif [ -f ${targetdir}/${fn} ]; then
+        ver_local=""
+        ver_server=""
+        ver_local=`cat ${targetdir}/${fn} | grep "#VERSION:" | cut -d ":" -f 2 | tr -d " " 2> /dev/null`
+        ver_server=`cat ${basedir}/version.ini | grep ${fn}= | cut -d "=" -f 2 | tr -d " " 2> /dev/null`
+        #echo "${ver_local} vs ${ver_server}"
+        if [ "${ver_local}" == "${ver_server}" ]; then
+            echo "${targetdir}/${fn} => Exists and same version"
+        else
+            echo "${targetdir}/${fn} => Exists and different version(local=${ver_local} vs server=${ver_server})"
+            dnFile
+        fi
+    else
+        echo "${targetdir}/${fn} => NOT exists"
+        dnFile
+    fi
+done
+
+exit 0
+

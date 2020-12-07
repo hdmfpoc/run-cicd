@@ -1,0 +1,30 @@
+#!/bin/bash
+
+CTRLDIR=~/cicd-template
+
+configserver=""
+# get parameters
+if [ $# -ge 6 ]; then
+    username=$1
+    password=$2
+    context=$3
+    profile=$4
+    basedir=$5
+    devlang=$6
+    if [ $# -eq 7 ]; then 
+      configserver=$7
+    fi
+else
+    read -p "# container image registry 로그인 username: " username
+    read -p "# container image registry 로그인 password: " password
+    read -p "# kubernetes context name(현재 context는 .): " context
+    read -p "# 배포대상 프로파일(dev/prod): " profile
+    read -p "# base directory(현재 directory는 .): " basedir
+    read -p "# 개발언어(java/react): " devlang
+    read -p "# config server ingress name: " configserver
+fi
+
+
+${CTRLDIR}/cmd/run-all ${username} ${password} ${context} ${profile} ${basedir} ${devlang} ${configserver}
+exit 0
+

@@ -1,0 +1,104 @@
+#!/bin/bash
+
+CTRLDIR=~/cicd-template
+
+echo ""
+echo "************** RUN READ CONFIG ***************"
+echo ""
+
+echo "STEP1. Get parameters "
+# get parameters
+if ([ $# -lt 4 ]) || ([ $# -eq 1 ] && [ "$1" == "-h" -o "$1" == "--help" ]); then
+  echo "read-config <profile> <root directory> <config kinds> <config server>"
+  echo " profile: 배포대상 환경 프로파일(ex:dev, prod) "
+  echo " root directory: project의 최상위 디렉토리. '.'은 현재 디렉토리 의미함. "
+  echo " config kinds: 읽은 config 종류로 cicd,cm,secret중 지정하며, comma로 복수값 지정 가능함 "
+  echo " config server: config server의 ingress명 "
+  echo " ex) ./read-config prod ~/worki cicd,cm,secret config-server"
+  echo " ex) ./read-config prod . cicd config-server"
+  exit 1
+fi
+
+profile=$1
+basedir=$2
+config_kinds=$3
+configserver=$4
+
+appname=`cat ${basedir}/pom.xml | grep \<finalName\> | cut -d ">" -f2 | cut -d "<" -f1`
+if [ "${appname}" == "" ]; then
+    echo "CAN'T get application name. check <build>/<finalName> in pom.xml"
+    exit 1
+fi
+CONFIG_KIND=""
+
+function mkFile() {
+    #echo "Donwload config file: ${fn} from ${url}"
+
+      wget -O ${fn} ${url}
+      if [ $? -eq 1 ]; then
+        echo "Fail to downloade: ${url}"
+        return 1
+      fi
+
+      len=`${CTRLDIR}/cmd/jq '.propertySources | length' ${fn}`
+      for ((i=0;i<$len;i++));
+      do
+        nm=`${CTRLDIR}/cmd/jq ".propertySources[$i].name" ${fn}`
+    if [ "${CONFIG_KIND}" == "secret" ] && [[ "$nm" =~ "application.properties" ]]; then
+        echo ""
+    elif [[ "$nm" =~ ".properties" ]]; then
+              #echo "$i => $nm"
+
+              chk=`${CTRLDIR}/cmd/jq ".propertySources[$i].source" ${fn} > $i-${fn}`
+              if [ $? -eq 0 ]; then
+                len2=`${CTRLDIR}/cmd/jq "keys | length" $i-${fn}`
+
+                for ((j=0;j<$len2;j++))
+                do
+                      key=`${CTRLDIR}/cmd/jq -r "keys[$j]" $i-${fn}`
+                      val=`${CTRLDIR}/cmd/jq -r ".[\"$key\"]" $i-${fn}`
+                      echo "$key=$val" >> ${ofn}
+                done
+              fi
+        fi
+    done
+}
+
+# set download url 환경변수
+INGRESS_CONFIG_SERVER=${configserver}
+
+
+# get config-server ingress host
+echo "STEP4. Get config server ingress host "
+host=`kubectl get ing ${INGRESS_CONFIG_SERVER} -o yaml | grep host: | cut -d ":" -f 2 | tr -d " "`
+if [ "${host}" == "" ]; then
+    echo "CAN't get config server ingress address"
+    exit 1
+fi
+
+url=""
+fn=""
+uri="http://${host}/${appname}"
+
+# generage file depends on config kind
+echo "STEP5. Generate config file "
+
+configs=`echo ${config_kinds} | sed "s/,/ /g"`
+
+for kind in ${configs}
+do
+  CONFIG_KIND=${kind}
+  echo "read config ->  ${kind}"
+  fn=${kind}.json
+  url=${uri}/${kind}-common,${kind}-${profile}
+  ofn=${basedir}/cicd/${kind}.properties
+  echo "" > ${ofn}
+
+  mkFile
+done
+
+echo ""
+echo "************** END READ CONFIG ***************"
+echo ""
+exit 0
+
