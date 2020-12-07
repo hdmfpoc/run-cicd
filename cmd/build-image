@@ -31,6 +31,11 @@ if [ "${devlang}" == "java" ]; then
   mvn clean package -DskipTests -f ${basedir}  
 fi
 
+# if the lang is react, do copy config file if not exists.  
+if ([ "${devlang}" == "react" ]) && ! ([ -f ${basedir}/default.conf.template  ]) ; then
+  cp ${CTRLDIR}/dockerfile/default.conf.template ${basedir} 
+fi
+
 # set variables from config.properties: converted from '.' to '_'
 echo "STEP2. Set environment variables "
 if [ -f ${basedir}/cicd/cicd-common.properties ]; then
