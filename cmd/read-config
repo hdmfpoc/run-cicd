@@ -84,10 +84,9 @@ uri="http://${host}/${appname}"
 # generage file depends on config kind
 echo "STEP3. Generate config file "
 
-configs=`echo ${config_kinds} | sed "s/,/ /g"`
+mkdir -p ${basedir}/deploy 2>/dev/null 
 
-# create deploy directory 
-mkdir -p ${basedir}/deploy 
+configs=`echo ${config_kinds} | sed "s/,/ /g"`
 
 for kind in ${configs}
 do

@@ -21,7 +21,7 @@ fi
 # check user and create if not
 
 # Switch to kubernetes-admin context
-kubectl config use-context kubernetes-admin@kubernetes
+#kubectl config use-context kubernetes-admin@kubernetes
 
 # Create namespace if not exists
 chk=`kubectl get ns | grep ${NS}`

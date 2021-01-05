@@ -143,8 +143,8 @@ fi
 if [ -f ${basedir}/cicd/cm-common.env ]; then
   cat ${basedir}/cicd/cm-common.env >> ${tmp}
 fi
-if [ -f ${basedir}/deploy/cm-${profile}.env ]; then
-    cat ${basedir}/deploy/cm-${profile}.env >> ${tmp}
+if [ -f ${basedir}/cicd/cm-${profile}.env ]; then
+    cat ${basedir}/cicd/cm-${profile}.env >> ${tmp}
 fi
 sort -u ${tmp} > ${filepath}
 
@@ -169,8 +169,8 @@ fi
 if [ -f ${basedir}/cicd/secret-common.env ]; then
   cat ${basedir}/cicd/secret-common.env >> ${tmp}
 fi
-if [ -f ${basedir}/deploy/secret-${profile}.env ]; then
-    cat ${basedir}/deploy/secret-${profile}.env >> ${tmp}
+if [ -f ${basedir}/cicd/secret-${profile}.env ]; then
+    cat ${basedir}/cicd/secret-${profile}.env >> ${tmp}
 fi
 sort -u ${tmp} > ${filepath}
 
@@ -209,8 +209,6 @@ if [ $? -eq 0 ]; then
 else
     echo "******** FAIL to convert deployment yaml !!! ******** "
 fi
-
-rm -rf ${basedir}/deploy 2>/dev/null
 
 echo ""
 echo "************* END DEPLOY service *****************"

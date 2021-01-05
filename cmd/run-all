@@ -27,6 +27,8 @@ devlang=$6
 configserver=$7
 echo "configserver=>${configserver}"
 
+mkdir -p ${basedir}/deploy 2>/dev/null 
+
 if [ $# -eq 6 ] || [ "${configserver}" == "" ]; then
   echo "NOT using config-server"
 else
@@ -46,6 +48,8 @@ if [ $? -eq 1 ]; then exit 1; fi
 # deploy
 ${CTRLDIR}/cmd/deploy ${context} ${profile} ${basedir}
 if [ $? -eq 1 ]; then exit 1; fi
+
+rm -rf ${basedir}/deploy 2>/dev/null 
 
 echo ""
 echo "************** END ALL ***************"
