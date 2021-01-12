@@ -4,6 +4,7 @@
 if ([ $# == 0 ]) || ([ $# -eq 1 ] && [ "$1" == "-h" -o "$1" == "--help" ]); then
   echo "create-user <user>"
   echo " user: username"
+  echo "MUST RUN as root user or sudo's user."
   exit 1
 fi
 
