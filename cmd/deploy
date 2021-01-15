@@ -143,20 +143,27 @@ echo "STEP5. Create ConfigMap "
 cm="${image_repository}-cm"
 filepath=${basedir}/deploy/cm-converted.properties
 tmp=${basedir}/deploy/tmp.env
+rm ${tmp} 2> /dev/null
+touch ${tmp}
+
 # 현재 배포 대상 profile에 맞는 변수 셋팅을 위해 _dev또는 _prod붙어 있는 변수에서 _dev또는_prod를 제거함
 # 예) mq_host_dev => mq_host
 if [ -f ${basedir}/deploy/cm.properties ]; then  # use config server 
   sed "s@_${profile}=@=@g" ${basedir}/deploy/cm.properties > ${filepath}
   cp ${filepath} ${tmp}
-else
-  echo "" > ${tmp}
+  echo "" >> ${tmp}
 fi
+# add cicd.properties to environments
+cat ${basedir}/deploy/cicd.properties >> ${tmp}
+
 # project폴더의 cm-common.env, cm-{profile}.env파일 내용을 추가
 if [ -f ${basedir}/cicd/cm-common.env ]; then
   cat ${basedir}/cicd/cm-common.env >> ${tmp}
+  echo "" >> ${tmp}
 fi
 if [ -f ${basedir}/cicd/cm-${profile}.env ]; then
-    cat ${basedir}/cicd/cm-${profile}.env >> ${tmp}
+  cat ${basedir}/cicd/cm-${profile}.env >> ${tmp}
+  echo "" >> ${tmp}
 fi
 sort -u ${tmp} > ${filepath}
 
@@ -171,18 +178,22 @@ echo "STEP6. Create Secret "
 secret="${image_repository}-secret"
 filepath=${basedir}/deploy/secret-converted.properties
 tmp=${basedir}/deploy/tmp.env
+rm ${tmp} 2> /dev/null
+touch ${tmp}
+
 if [ -f ${basedir}/deploy/secret.properties ]; then
   sed "s@_${profile}=@=@g" ${basedir}/deploy/secret.properties > ${filepath}
   cp ${filepath} ${tmp}
-else
-  echo "" > ${tmp}
+  echo "" >> ${tmp}
 fi
 # project폴더의 secret-common.env, secret-{profile}.env파일 내용을 추가
 if [ -f ${basedir}/cicd/secret-common.env ]; then
   cat ${basedir}/cicd/secret-common.env >> ${tmp}
+  echo "" >> ${tmp}
 fi
 if [ -f ${basedir}/cicd/secret-${profile}.env ]; then
-    cat ${basedir}/cicd/secret-${profile}.env >> ${tmp}
+  cat ${basedir}/cicd/secret-${profile}.env >> ${tmp}
+  echo "" >> ${tmp}
 fi
 sort -u ${tmp} > ${filepath}
 
