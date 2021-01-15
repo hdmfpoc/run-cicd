@@ -29,6 +29,9 @@ echo "configserver=>${configserver}"
 
 mkdir -p ${basedir}/deploy 2>/dev/null 
 
+# clear deploy directory
+rm -f ${basedir}/deploy/* 2>/dev/null
+
 if [ $# -eq 6 ] || [ "${configserver}" == "" ]; then
   echo "NOT using config-server"
 else
