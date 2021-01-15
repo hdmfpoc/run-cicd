@@ -42,7 +42,7 @@ Replace jq with jq-mac
 ```
 $ cd ~/run-cicd/cmd
 $ rm jq
-$ mv jq-mac jq
+$ cp jq-mac jq
 ```
  
 
