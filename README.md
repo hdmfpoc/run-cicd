@@ -37,4 +37,12 @@ run-cicd {id for image registry} {password for image registry} . {profile} . {la
 ex) run-cicd hklee passw0rd . dev . java config 
 ```
 
+## for Mac user
+Replace jq with jq-mac
+```
+$ cd ~/run-cicd/cmd
+$ rm jq
+$ mv jq-mac jq
+```
+ 
 
