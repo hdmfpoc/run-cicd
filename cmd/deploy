@@ -142,8 +142,7 @@ echo "STEP5. Create ConfigMap "
 
 cm="${image_repository}-cm"
 filepath=${basedir}/deploy/cm-converted.properties
-tmp=${basedir}/deploy/tmp.env
-rm ${tmp} 2> /dev/null
+tmp=${basedir}/deploy/tmp-cm.env
 touch ${tmp}
 
 # 현재 배포 대상 profile에 맞는 변수 셋팅을 위해 _dev또는 _prod붙어 있는 변수에서 _dev또는_prod를 제거함
@@ -177,8 +176,7 @@ echo "STEP6. Create Secret "
 
 secret="${image_repository}-secret"
 filepath=${basedir}/deploy/secret-converted.properties
-tmp=${basedir}/deploy/tmp.env
-rm ${tmp} 2> /dev/null
+tmp=${basedir}/deploy/tmp-secret.env
 touch ${tmp}
 
 if [ -f ${basedir}/deploy/secret.properties ]; then
