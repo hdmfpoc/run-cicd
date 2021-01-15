@@ -5,6 +5,7 @@ This tool have shells, yaml template files, Dockerfiles.
    
 You must follow rules to use this tool.  
 please, refer below link.    
+[run-cicd: Linux shell로 만든 가벼운 CI/CD tool](https://happycloud-lee.tistory.com/195)
 
 ## How to install
 - Login centos server  
