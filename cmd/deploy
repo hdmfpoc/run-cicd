@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CTRLDIR=~/cicd-template
+CTRLDIR=~/run-cicd
 
 echo ""
 echo "************* RUN DEPLOY service *****************"
@@ -67,6 +67,9 @@ file1=""
 if [ -f ${basedir}/deploy/cicd.properties ]; then  # use config server 
   file1=cicd.properties
   ns=`cat ${basedir}/deploy/${file1} | grep namespace= | cut -d "=" -f 2`
+elif [ -f ${basedir}/cicd/cicd-${profile}.properties ]; then
+  file1=cicd-${profile}.properties
+  ns=`cat ${basedir}/cicd/${file1} | grep namespace= | cut -d "=" -f 2`
 elif [ -f ${basedir}/cicd/cicd-common.properties ]; then
   file1=cicd-common.properties
   ns=`cat ${basedir}/cicd/${file1} | grep namespace= | cut -d "=" -f 2`
@@ -97,6 +100,8 @@ echo ""
 echo "STEP2. Set environment variables "
 if [ -f ${basedir}/cicd/cicd-common.properties ]; then  #NOT use config server 
   eval $(${CTRLDIR}/cmd/set-env ${basedir}/cicd/cicd-common.properties)
+elif [ -f ${basedir}/cicd/cicd-${profile}.properties ]; then  #NOT use config server 
+  eval $(${CTRLDIR}/cmd/set-env ${basedir}/cicd/cicd-${profile}.properties)
 else
   eval $(${CTRLDIR}/cmd/set-env ${basedir}/deploy/cicd.properties)
 fi

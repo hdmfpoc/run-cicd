@@ -6,15 +6,13 @@ echo ""
 
 # get parameters
 if ([ $# -lt 1 ]) || ([ $# -eq 1 ] && [ "$1" == "-h" -o "$1" == "--help" ]); then
-  echo "clear-all <root directory>"
-  echo " root directory: project의 최상위 디렉토리. '.'은 현재 디렉토리 의미함. "
-  echo " ex) ./clear-all ~/work"
-  echo " ex) ./clear-all ."
+  echo "clear-all <application name>"
+  echo " application name: image repository name을 지정하면 됨"
+  echo " ex) ./clear-all webhook"
   exit 2
 fi
 
-basedir=$1
-yaml=${basedir}/cicd/deploy-converted.yaml
+app=$1
 
 resource_kind=""
 resource_postfix=""
@@ -29,13 +27,11 @@ function clearCMSecret() {
 }
 
 
-# delete using deploy yaml
-kubectl delete -f ${yaml} 2> /dev/null
-
-# get app name
-tmp=`cat ${yaml} | grep app: | cut -d ":" -f2 | tr -d " "`
-apps=(${tmp})
-app=${apps[0]}
+# delete statefulset/deployments, service, ingress
+kubectl delete statefulset ${app} 2> /dev/null
+kubectl delete deploy ${app} 2> /dev/null
+kubectl delete service ${app} 2> /dev/null 
+kubectl delete ing ${app} 2> /dev/null 
 
 # delete configmap
 resource_kind=configmap

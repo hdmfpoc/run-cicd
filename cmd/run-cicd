@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CTRLDIR=~/cicd-template
+CTRLDIR=~/run-cicd
 
 configserver=""
 # get parameters
