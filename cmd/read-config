@@ -42,12 +42,33 @@ function mkFile() {
   fi
 
   len=`${CTRLDIR}/cmd/jq '.propertySources | length' ${fp}/${fn}`
+  switch=on
   for ((i=0;i<$len;i++));
   do
+    switch=off
     nm=`${CTRLDIR}/cmd/jq ".propertySources[$i].name" ${fp}/${fn}`
-    if [ "${CONFIG_KIND}" == "secret" ] && [[ "$nm" =~ "application.properties" ]]; then
+
+    #evaluate do or not
+    if [ "${CONFIG_KIND}" == "cicd" ]; then
+      if [[ "$nm" =~ "cicd-" ]] && [[ "$nm" =~ ".properties" ]]; then
+        switch=on
+      fi
+    elif [ "${CONFIG_KIND}" == "cm" ]; then
+      if [[ "$nm" =~ "cm-" ]] && [[ "$nm" =~ ".properties" ]]; then
+        switch=on
+      fi
+      if [[ "$nm" =~ "application.properties" ]]; then
+        switch=on
+      fi
+    elif [ "${CONFIG_KIND}" == "secret" ]; then
+      if [[ "$nm" =~ "secret-" ]] && [[ "$nm" =~ ".properties" ]]; then
+        switch=on
+      fi
+    fi
+
+    if [ "${switch}" == "off" ]; then
       echo ""
-    elif [[ "$nm" =~ ".properties" ]]; then
+    else 
       #echo "$i => $nm"
 
       chk=`${CTRLDIR}/cmd/jq ".propertySources[$i].source" ${fp}/${fn} > ${fp}/$i-${fn}`
