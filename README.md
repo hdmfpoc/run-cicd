@@ -1,17 +1,21 @@
-# cicd-template: CI/CD tool
+# run-cicd: CI/CD tool using linux shells
 
-This tool have shells, yaml template files, Dockerfiles.   
+It is CI/CD tool to deploy workloads on kubernetes.   
+This tool have shells, yaml template files, Dockerfiles.      
+   
+You must follow rules to use this tool.  
+please, refer below link.    
 
 ## How to install
 - Login centos server  
 - switch os user 
 - clone tool
 ```
-$ git clone https://github.com/happyspringcloud/cicd-template.git 
+$ git clone https://github.com/happyspringcloud/run-cicd.git 
 ```
 - make symbolic link
 ```
-$ sudo ln -s ~/cicd-template/cmd/run-cicd /usr/local/bin/run-cicd
+$ sudo ln -s ~/run-cicd/cmd/run-cicd /usr/local/bin/run-cicd
 ```
 
 ## How to run
@@ -25,6 +29,11 @@ $ cd webhook/
 - run cicd
 ```
 $ run-cicd
+```
+TIP) You can also run it using parameters
+```
+run-cicd {id for image registry} {password for image registry} . {profile} . {language} {config server ingress name} 
+ex) run-cicd hklee passw0rd . dev . java config 
 ```
 
 
