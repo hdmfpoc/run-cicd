@@ -5,7 +5,7 @@ CLUSTER=kubernetes
 NS=""
 # Get parameter
 if ([ $# == 0 ]) || ([ $# -eq 1 ] && [ "$1" == "-h" -o "$1" == "--help" ]); then
-  echo "setup-config [<CLUSTER>] <NAMESPACE POSTFIX>"
+  echo "setup-config [<CLUSTER>] <NAMESPACE>"
   echo " CLUSTER: cluster명이며 기본값은 kubernetes이며 생략할 수 있음"
   echo " NAMESPACE: namespace. 필수값임"
   exit 2
@@ -42,7 +42,7 @@ else
   echo "[ serviceaccount sa-${NS} already exists in ${NS} ]"
 fi
 
-# Create rolebinding
+# Create rolebinding: admin role for sa to created namespace
 chk=`kubectl get rolebinding -n ${NS} | grep rb-sa-${NS}`
 if [ $? == 1 ]; then
   echo "[ Create rolebinding rb-sa-${NS} ]"
@@ -51,6 +51,14 @@ else
   echo "[ rolebinding rb-sa-${NS} already exists ]"
 fi
 
+# Create rolebinding: view clusterrole for sa to all namespace
+chk=`kubectl get clusterrolebinding | grep crb-view-sa-${NS}`
+if [ $? == 1 ]; then
+  echo "[ Create clusterrolebinding rb-view-sa-${NS} ]"
+  kubectl create clusterrolebinding rb-view-sa-${NS} --clusterrole=view --serviceaccount=${NS}:sa-${NS}
+else
+  echo "[ clusterrolebinding rb-view-sa-${NS} already exists ]"
+fi
 
 # Get token of the serviceaccount
 secret=`kubectl get secret -n ${NS} | grep sa-${NS} | cut -d " " -f1`
@@ -95,4 +103,3 @@ fi
 echo "##### END of Setup kubeconfig! #####"
 
 exit 0
-
