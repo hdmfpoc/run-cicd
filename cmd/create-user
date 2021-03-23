@@ -12,13 +12,12 @@ user=$1
 
 grep ${user} /etc/passwd 2>/dev/null
 if [ $? -eq 0 ]; then
-        echo "${user} is already exists"
-        exit 0
+  echo "${user} is already exists"
+else
+  sudo useradd ${user}
+  sudo passwd ${user}
+  sudo usermod -aG docker ${user}
 fi
-
-sudo useradd ${user}
-sudo passwd ${user}
-sudo usermod -aG docker ${user}
 
 # cp kubeconfig
 sudo mkdir -p /home/${user}/.kube
