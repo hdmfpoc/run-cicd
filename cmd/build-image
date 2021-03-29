@@ -28,6 +28,7 @@ echo ""
 
 # if the lang is java, do maven build. 
 if [ "${devlang}" == "java" ]; then
+  echo "*** RUN -> mvn clean package -DskipTests -f ${basedir}"
   mvn clean package -DskipTests -f ${basedir}  
 fi
 
@@ -64,8 +65,10 @@ fi
 echo "STEP4. Build image "
 echo "image: ${image_registry}/${image_project}/${image_repository}:${image_tag}"
 if [ "${devlang}" == "java" ]; then
+  echo "*** RUN -> docker build --build-arg ARTIFACTORY_FILE=${image_repository}.jar -f ${CTRLDIR}/dockerfile/${dockerfile_name} -t ${image_registry}/${image_project}/${image_repository}:${image_tag} ${basedir}"
   docker build --build-arg ARTIFACTORY_FILE=${image_repository}.jar -f ${CTRLDIR}/dockerfile/${dockerfile_name} -t ${image_registry}/${image_project}/${image_repository}:${image_tag} ${basedir}
 else
+  echo "*** RUN -> docker build -f ${CTRLDIR}/dockerfile/${dockerfile_name} -t ${image_registry}/${image_project}/${image_repository}:${image_tag} ${basedir}"
   docker build -f ${CTRLDIR}/dockerfile/${dockerfile_name} -t ${image_registry}/${image_project}/${image_repository}:${image_tag} ${basedir}
 fi
 echo ""
@@ -83,10 +86,13 @@ if [ $? == 1 ]; then
 fi
 
 # clone image as 'latest'
+echo "*** RUN -> docker tag ${image_registry}/${image_project}/${image_repository}:${image_tag} ${image_registry}/${image_project}/${image_repository}:latest"
 docker tag ${image_registry}/${image_project}/${image_repository}:${image_tag} ${image_registry}/${image_project}/${image_repository}:latest
 
 # push them
+echo "*** RUN -> docker push ${image_registry}/${image_project}/${image_repository}:${image_tag}"
 docker push ${image_registry}/${image_project}/${image_repository}:${image_tag}
+echo "*** RUN -> docker push ${image_registry}/${image_project}/${image_repository}:latest"
 docker push ${image_registry}/${image_project}/${image_repository}:latest
 
 echo ""

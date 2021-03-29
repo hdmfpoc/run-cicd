@@ -26,7 +26,7 @@ function generate-cm() {
         if [ $? -eq 0 ]; then
               kubectl delete configmap ${cm} -n ${ns}
         fi
-        echo "RUN=>kubectl create configmap ${cm} --from-env-file=${filepath} -n ${ns}"
+        echo "*** RUN -> kubectl create configmap ${cm} --from-env-file=${filepath} -n ${ns}"
         kubectl create configmap ${cm} --from-env-file=${filepath} -n ${ns}
         if [ $? -eq 1 ]; then
               echo "FAIL to create configmap ${cm}"
@@ -42,7 +42,7 @@ function generate-secret() {
         if [ $? -eq 0 ]; then
               kubectl delete secret ${secret} -n ${ns}
         fi
-        echo "RUN=>kubectl create secret generic ${secret} --from-env-file=${filepath} -n ${ns}"
+        echo "*** RUN -> kubectl create secret generic ${secret} --from-env-file=${filepath} -n ${ns}"
         kubectl create secret generic ${secret} --from-env-file=${filepath} -n ${ns}
         if [ $? -eq 1 ]; then
               echo "FAIL to create secret ${secret}"
@@ -226,6 +226,7 @@ sed "s@{{ LIMIT_MEM }}@${limit_mem}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ SERVICE_HOST }}@${service_host}@g" ${yaml} > ${basedir}/deploy/deploy-converted.yaml
 
 if [ $? -eq 0 ]; then
+    echo "*** RUN -> kubectl apply -f ${basedir}/deploy/deploy-converted.yaml"
     kubectl apply -f ${basedir}/deploy/deploy-converted.yaml
 else
     echo "******** FAIL to convert deployment yaml !!! ******** "
