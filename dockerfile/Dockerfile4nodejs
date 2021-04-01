@@ -1,20 +1,22 @@
 FROM node:slim
 
+ARG MAIN_APP
+ENV MAIN_APP ${MAIN_APP}
 ENV ARTIFACTORY_HOME /home/artifactory
 
 # Add an docker user, make work dir
 RUN adduser --disabled-password --gecos "" docker && \
   echo "docker ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
-  mkdir -p ${HOME} && \
-  chown docker:docker ${HOME}
+  mkdir -p ${ARTIFACTORY_HOME} && \
+  chown docker:docker ${ARTIFACTORY_HOME}
 
-WORKDIR ${HOME}
+WORKDIR ${ARTIFACTORY_HOME}
 
 COPY . ./
 
-#RUN chmod -R 777 ./health 2> /dev/null 
 RUN npm install
 
 # RUN as docker user
 USER docker
-CMD [ "node app" ]
+CMD [ "node ${MAIN_APP}" ]
+

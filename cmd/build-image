@@ -54,6 +54,8 @@ dockerfile_name=""
 
 if [ "${devlang}" == "java" ]; then
   dockerfile_name=Dockerfile4java
+elif [ "${devlang}" == "nodejs" ]; then
+  dockerfile_name=Dockerfile4nodejs
 elif [ "${devlang}" == "react" ]; then
   dockerfile_name=Dockerfile4react
 else
@@ -67,6 +69,17 @@ echo "image: ${image_registry}/${image_project}/${image_repository}:${image_tag}
 if [ "${devlang}" == "java" ]; then
   echo "*** RUN -> docker build --build-arg ARTIFACTORY_FILE=${image_repository}.jar -f ${CTRLDIR}/dockerfile/${dockerfile_name} -t ${image_registry}/${image_project}/${image_repository}:${image_tag} ${basedir}"
   docker build --build-arg ARTIFACTORY_FILE=${image_repository}.jar -f ${CTRLDIR}/dockerfile/${dockerfile_name} -t ${image_registry}/${image_project}/${image_repository}:${image_tag} ${basedir}
+elif [ "${devlang}" == "nodejs" ]; then
+  main_app=`${CTRLDIR}/cmd/jq '.main' ${basedir}/package.json`
+  main_app="${main_app%\"}"
+  main_app="${main_app#\"}"
+  if [ "${main_app}" == "" ]; then
+    echo "CAN'T get main application. It must be specified in package.json as 'main' key."
+    exit 1
+  fi
+
+  echo "*** RUN -> docker build --build-arg MAIN_APP=${main_app} -f ${CTRLDIR}/dockerfile/${dockerfile_name} -t ${image_registry}/${image_project}/${image_repository}:${image_tag} ${basedir}"
+  docker build --build-arg MAIN_APP=${main_app} -f ${CTRLDIR}/dockerfile/${dockerfile_name} -t ${image_registry}/${image_project}/${image_repository}:${image_tag} ${basedir}
 else
   echo "*** RUN -> docker build -f ${CTRLDIR}/dockerfile/${dockerfile_name} -t ${image_registry}/${image_project}/${image_repository}:${image_tag} ${basedir}"
   docker build -f ${CTRLDIR}/dockerfile/${dockerfile_name} -t ${image_registry}/${image_project}/${image_repository}:${image_tag} ${basedir}

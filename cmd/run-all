@@ -5,7 +5,7 @@ echo ""
 
 # get parameters
 if ([ $# -lt 6 ]) || ([ $# -eq 1 ] && [ "$1" == "-h" -o "$1" == "--help" ]); then
-  echo "run-all <reg username> <reg password> <k8s-context> <profile> <root directory> <config server>"
+  echo "run-all <reg username> <reg password> <k8s-context> <profile> <root directory> <dev lang> <config server>"
   echo " reg username: container image registry username "
   echo " reg password: container image registry password "
   echo " k8s-context: 사용할 k8s context명. kubectl config view로 context 목록 확인. '.'은 현재 컨텍스트 의미함 "
@@ -33,7 +33,7 @@ mkdir -p ${basedir}/deploy 2>/dev/null
 rm -f ${basedir}/deploy/* 2>/dev/null
 
 if [ $# -eq 6 ] || [ "${configserver}" == "" ]; then
-  echo "NOT using config-server"
+  echo "***** NOT using config-server"
 else
   # read only cicd related configuration
   ${CTRLDIR}/cmd/read-config ${profile} ${basedir} cicd ${configserver}

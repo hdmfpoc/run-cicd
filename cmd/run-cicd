@@ -20,7 +20,7 @@ else
     read -p "# kubernetes context name(현재 context는 .): " context
     read -p "# 배포대상 프로파일(dev/prod): " profile
     read -p "# base directory(현재 directory는 .): " basedir
-    read -p "# 개발언어(java/react): " devlang
+    read -p "# 개발언어(java/nodejs/react): " devlang
     read -p "# config server ingress name: " configserver
 fi
 
