@@ -1,22 +1,18 @@
+#VERSION:1.0
 FROM node:slim
 
 ARG MAIN_APP
-ENV MAIN_APP ${MAIN_APP}
+ENV APPNAME ${MAIN_APP}
 ENV ARTIFACTORY_HOME /home/artifactory
 
-# Add an docker user, make work dir
-RUN adduser --disabled-password --gecos "" docker && \
-  echo "docker ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
-  mkdir -p ${ARTIFACTORY_HOME} && \
-  chown docker:docker ${ARTIFACTORY_HOME}
+# Add a docker user, make work dir
+RUN adduser --disabled-password --gecos "" docker && echo "docker ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && mkdir -p ${ARTIFACTORY_HOME} && chown docker:docker ${ARTIFACTORY_HOME}
 
 WORKDIR ${ARTIFACTORY_HOME}
 
-COPY . ./
+# Copy your jar to the container
+COPY . ${ARTIFACTORY_HOME}
 
-RUN npm install
-
-# RUN as docker user
+# Launch the artifactory as docker user
 USER docker
-CMD [ "node ${MAIN_APP}" ]
-
+CMD [ "node ${APPNAME}" ]
