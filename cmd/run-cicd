@@ -21,7 +21,7 @@ else
     read -p "# 배포대상 프로파일(dev/prod): " profile
     read -p "# base directory(현재 directory는 .): " basedir
     read -p "# 개발언어(java/nodejs/react): " devlang
-    read -p "# config server ingress name: " configserver
+    read -p "# config server ingress name(해당없으면 ENTER): " configserver
 fi
 
 
