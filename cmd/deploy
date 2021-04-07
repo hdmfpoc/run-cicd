@@ -247,7 +247,7 @@ if ([ "${readiness_enabled}" == "" ]) || ([ "${readiness_enabled}" == "false" ])
   sed "s@{{ DEFINE_READINESS_DELAY_SECONDS }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
   sed "s@{{ DEFINE_READINESS_PERIOD_SECONDS }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
   sed "s@{{ DEFINE_READINESS_TIMEOUT_SECONDS }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
-  sed "s@{{ DEFINE_READINESS_SUCCESS_THRESHOLD }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml
+  sed "s@{{ DEFINE_READINESS_SUCCESS_THRESHOLD }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
   sed "s@{{ DEFINE_READINESS_FAILURE_THRESHOLD }@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}  
 else
   sed "s@{{ DEFINE_READINESS }}@readinessProbe:@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
