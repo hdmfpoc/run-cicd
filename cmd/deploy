@@ -84,12 +84,6 @@ if [ "${ns}" == "" ]; then
   exit 1
 fi
 
-if [ "${workload_kind}" == "" ]; then
-  deploy_kind="StatefulSet"
-else
-  deploy_kind="${workload_kind}"
-fi
-
 echo ""
 
 # set variables from config.properties: converted from '.' to '_'
@@ -107,6 +101,13 @@ else
     cat ${basedir}/cicd/cicd-${profile}.properties >> ${basedir}/deploy/cicd.properties
     eval $(${CTRLDIR}/cmd/set-env ${basedir}/cicd/cicd-${profile}.properties)
   fi
+fi
+
+# Get Workload kind 
+if [ "${workload_kind}" == "" ]; then
+  deploy_kind="StatefulSet"
+else
+  deploy_kind="${workload_kind}"
 fi
 
 # switch kubenetes context
@@ -213,6 +214,7 @@ cp ${CTRLDIR}/deploy/deploy.yaml ${yaml}
 sed "s@{{ WORKLOAD_KIND }}@${deploy_kind}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 if [ "${deploy_kind}" == "StatefulSet" ]; then
   sed "s@{{ DEFINE_SERVICE_NAME }}@serviceName: ${image_repository}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_MIN_READY_SECONDS }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 else
   sed "s@{{ DEFINE_SERVICE_NAME }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
   if [ "${min_ready_seconds}" == "" ]; then
