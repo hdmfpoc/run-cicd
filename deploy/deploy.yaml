@@ -1,13 +1,14 @@
 #VERSION:1.2
 apiVersion: apps/v1
-kind: StatefulSet
+kind: {{ WORKLOAD_KIND }}
 metadata:
   name: {{ SERVICE_NAME }}
   namespace: {{ NAMESPACE }}
   labels:
     app: {{ SERVICE_NAME }}
 spec:
-  serviceName: {{ SERVICE_NAME }}
+  {{ DEFINE_SERVICE_NAME }}
+  {{ DEFINE_MIN_READY_SECONDS }}
   selector:
     matchLabels:
       app: {{ SERVICE_NAME }}

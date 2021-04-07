@@ -84,15 +84,11 @@ if [ "${ns}" == "" ]; then
   exit 1
 fi
 
-deploy_kind="Deployment"
-lists=`cat ${CTRLDIR}/deploy/deploy.yaml | grep "kind: " | cut -d ":" -f2 | tr -d " "`
-for kind in ${lists}
-do
-  if [[ "${kind}" =~ "StatefulSet" ]]; then
-    deploy_kind=StatefulSet
-    break
-  fi
-done
+if [ "${workload_kind}" == "" ]; then
+  deploy_kind="StatefulSet"
+else
+  deploy_kind="${workload_kind}"
+fi
 
 echo ""
 
@@ -122,8 +118,12 @@ echo ""
 # check current version
 echo "STEP4. Delete application if same version exists "
 
-CURTAG=$(kubectl get ${deploy_kind} ${image_repository}  -n ${ns} -o yaml 2> /dev/null | grep "image: ${image_registry}/${image_project}/${image_repository}:" | cut -d ':' -f3)
-echo "FIND CURRENT VERSION: ${CURTAG}"
+CURTAG=$(kubectl get ${deploy_kind} ${image_repository} -n ${ns} -o yaml 2> /dev/null | grep "image: ${image_registry}/${image_project}/${image_repository}:" | cut -d ':' -f3)
+if [ "${CURTAG}" == "" ]; then
+  echo ">>> NO SAME VERSION EXISTS"
+else 
+  echo ">>> FIND CURRENT VERSION: ${CURTAG}"
+fi 
 
 echo "deploy kind: ${deploy_kind}, version: ${CURTAG} -> ${image_tag}"
 
@@ -209,7 +209,16 @@ IMG="${image_registry}\/${image_project}\/${image_repository}:${image_tag}"
 yaml=${basedir}/deploy/deploy.yaml
 tmp=${basedir}/deploy/tmp.yaml
 cp ${CTRLDIR}/deploy/deploy.yaml ${yaml}
-sed "s@{{ SERVICE_NAME }}@${image_repository}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+if [ "${deploy_kind}" == "StatefulSet" ]; then
+  sed "s@{{ DEFINE_SERVICE_NAME }}@serviceName: ${image_repository}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+else
+  sed "s@{{ DEFINE_SERVICE_NAME }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  if [ "${min_ready_seconds}" == "" ]; then
+    sed "s@{{ DEFINE_MIN_READY_SECONDS }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  else
+    sed "s@{{ DEFINE_MIN_READY_SECONDS }}@minReadySeconds: ${min_ready_seconds}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  fi
+fi 
 sed "s@{{ NAMESPACE }}@${namespace}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ SERVICEACCOUNT }}@${serviceaccount}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ IMAGE_NAME }}@${IMG}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
