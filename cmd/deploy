@@ -209,6 +209,8 @@ IMG="${image_registry}\/${image_project}\/${image_repository}:${image_tag}"
 yaml=${basedir}/deploy/deploy.yaml
 tmp=${basedir}/deploy/tmp.yaml
 cp ${CTRLDIR}/deploy/deploy.yaml ${yaml}
+
+sed "s@{{ WORKLOAD_KIND }}@${deploy_kind}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 if [ "${deploy_kind}" == "StatefulSet" ]; then
   sed "s@{{ DEFINE_SERVICE_NAME }}@serviceName: ${image_repository}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 else
@@ -219,6 +221,7 @@ else
     sed "s@{{ DEFINE_MIN_READY_SECONDS }}@minReadySeconds: ${min_ready_seconds}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
   fi
 fi 
+sed "s@{{ SERVICE_NAME }}@${image_repository}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ NAMESPACE }}@${namespace}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ SERVICEACCOUNT }}@${serviceaccount}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ IMAGE_NAME }}@${IMG}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
