@@ -273,8 +273,8 @@ else
   sed "s@{{ DEFINE_READINESS_DELAY_SECONDS }}@initialDelaySeconds: ${readiness_delay_seconds}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
   sed "s@{{ DEFINE_READINESS_PERIOD_SECONDS }}@periodSeconds: ${readiness_period_seconds}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
   sed "s@{{ DEFINE_READINESS_TIMEOUT_SECONDS }}@timeoutSeconds: ${readiness_timeout_seconds}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
-  sed "s@{{ DEFINE_READINESS_SUCCESS_THRESHOLD }}@successThreshold: ${readiness_success_threshold}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml
-  sed "s@{{ DEFINE_READINESS_FAILURE_THRESHOLD }@failureThreshold: ${readiness_failure_threshold}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml
+  sed "s@{{ DEFINE_READINESS_SUCCESS_THRESHOLD }}@successThreshold: ${readiness_success_threshold}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_FAILURE_THRESHOLD }@failureThreshold: ${readiness_failure_threshold}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 fi
 
 if [ $? -eq 0 ]; then
