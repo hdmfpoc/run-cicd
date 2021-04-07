@@ -240,7 +240,7 @@ sed "s@{{ LIMIT_MEM }}@${limit_mem}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ SERVICE_HOST }}@${service_host}@g" ${yaml} > ${basedir}/deploy/deploy-converted.yaml
 
 # Get readiness values
-if ([ "${readiness_path}" == "" ]) || ([ "${readiness_path}" == "false" ]); then 
+if ([ "${readiness_enabled}" == "" ]) || ([ "${readiness_enabled}" == "false" ]); then 
   sed "s@{{ DEFINE_READINESS }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
   sed "s@{{ DEFINE_READINESS_METHOD }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
   sed "s@{{ DEFINE_READINESS_PATH }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
