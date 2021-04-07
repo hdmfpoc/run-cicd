@@ -237,7 +237,6 @@ sed "s@{{ REQ_CPU }}@${req_cpu}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ REQ_MEM }}@${req_mem}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ LIMIT_CPU }}@${limit_cpu}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ LIMIT_MEM }}@${limit_mem}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
-sed "s@{{ SERVICE_HOST }}@${service_host}@g" ${yaml} > ${basedir}/deploy/deploy-converted.yaml
 
 # Get readiness values
 if ([ "${readiness_enabled}" == "" ]) || ([ "${readiness_enabled}" == "false" ]); then 
@@ -284,6 +283,8 @@ if [ $? -eq 0 ]; then
 else
     echo "******** FAIL to convert deployment yaml !!! ******** "
 fi
+
+sed "s@{{ SERVICE_HOST }}@${service_host}@g" ${yaml} > ${basedir}/deploy/deploy-converted.yaml
 
 echo ""
 echo "************* END DEPLOY service *****************"
