@@ -277,14 +277,14 @@ else
   sed "s@{{ DEFINE_READINESS_FAILURE_THRESHOLD }@failureThreshold: ${readiness_failure_threshold}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 fi
 
+sed "s@{{ SERVICE_HOST }}@${service_host}@g" ${yaml} > ${basedir}/deploy/deploy-converted.yaml
+
 if [ $? -eq 0 ]; then
     echo "*** RUN -> kubectl apply -f ${basedir}/deploy/deploy-converted.yaml"
     kubectl apply -f ${basedir}/deploy/deploy-converted.yaml
 else
     echo "******** FAIL to convert deployment yaml !!! ******** "
 fi
-
-sed "s@{{ SERVICE_HOST }}@${service_host}@g" ${yaml} > ${basedir}/deploy/deploy-converted.yaml
 
 echo ""
 echo "************* END DEPLOY service *****************"
