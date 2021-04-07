@@ -199,7 +199,7 @@ sort -u ${tmp} > ${filepath}
 generate-secret
 if [ "${RESULT}" == "NK" ]; then exit 1; fi
 
-echo ""
+echo "" 
 
 # deploy.yaml을 이용하여 배포 yaml생성
 echo "STEP7. Deploy application "
@@ -238,6 +238,45 @@ sed "s@{{ REQ_MEM }}@${req_mem}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ LIMIT_CPU }}@${limit_cpu}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ LIMIT_MEM }}@${limit_mem}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
 sed "s@{{ SERVICE_HOST }}@${service_host}@g" ${yaml} > ${basedir}/deploy/deploy-converted.yaml
+
+# Get readiness values
+if [ "${readiness_path}" == "" ]; then 
+  sed "s@{{ DEFINE_READINESS }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_METHOD }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_PATH }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_PORT }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_DELAY_SECONDS }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_PERIOD_SECONDS }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_TIMEOUT_SECONDS }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_SUCCESS_THRESHOLD }}@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml
+  sed "s@{{ DEFINE_READINESS_FAILURE_THRESHOLD }@@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml  
+else
+  sed "s@{{ DEFINE_READINESS }}@readinessProbe:@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_METHOD }}@httpGet:@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_PATH }}@path: ${readiness_path}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_PORT }}@port: ${service_target_port}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  
+  if [ "${readiness_delay_seconds}" == "" ]; then 
+    readiness_delay_seconds=0
+  fi 
+  if [ "${readiness_period_seconds}" == "" ]; then 
+    readiness_period_seconds=10
+  fi 
+  if [ "${readiness_timeout_seconds}" == "" ]; then 
+    readiness_timeout_seconds=1
+  fi
+  if [ "${readiness_success_threshold}" == "" ]; then 
+    readiness_success_threshold=1
+  fi
+  if [ "${readiness_failure_threshold}" == "" ]; then 
+    readiness_failure_threshold=3
+  fi
+  sed "s@{{ DEFINE_READINESS_DELAY_SECONDS }}@initialDelaySeconds: ${readiness_delay_seconds}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_PERIOD_SECONDS }}@periodSeconds: ${readiness_period_seconds}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_TIMEOUT_SECONDS }}@timeoutSeconds: ${readiness_timeout_seconds}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml}
+  sed "s@{{ DEFINE_READINESS_SUCCESS_THRESHOLD }}@successThreshold: ${readiness_success_threshold}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml
+  sed "s@{{ DEFINE_READINESS_FAILURE_THRESHOLD }@failureThreshold: ${readiness_failure_threshold}@g" ${yaml} > ${tmp} && mv ${tmp} ${yaml
+fi
 
 if [ $? -eq 0 ]; then
     echo "*** RUN -> kubectl apply -f ${basedir}/deploy/deploy-converted.yaml"

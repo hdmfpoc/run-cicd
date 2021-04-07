@@ -44,6 +44,15 @@ spec:
           limits:
             cpu: {{ LIMIT_CPU }}
             memory: {{ LIMIT_MEM }}
+        {{ DEFINE_READINESS }}
+          {{ DEFINE_READINESS_METHOD }}
+            {{ DEFINE_READINESS_PATH }}
+            {{ DEFINE_READINESS_PORT }}
+          {{ DEFINE_READINESS_DELAY_SECONDS }}
+          {{ DEFINE_READINESS_PERIOD_SECONDS }}
+          {{ DEFINE_READINESS_TIMEOUT_SECONDS }}
+          {{ DEFINE_READINESS_SUCCESS_THRESHOLD }}
+          {{ DEFINE_READINESS_FAILURE_THRESHOLD }
 ---
 apiVersion: v1
 kind: Service
