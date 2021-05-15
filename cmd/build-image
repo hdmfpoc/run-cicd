@@ -3,7 +3,7 @@
 if [ "${RUNCICD_PATH}" == ""]; then 
   CTRLDIR=~/run-cicd
 else
-  echo "=>${RUNCICD_PATH}"
+  
   CTRLDIR=${RUNCICD_PATH}
 fi
 
