@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CTRLDIR=~/run-cicd
+CTRLDIR="$( cd "$( dirname "$0" )" && cd .. && pwd -P )"
 
 echo ""
 echo "************* RUN DEPLOY service *****************"
