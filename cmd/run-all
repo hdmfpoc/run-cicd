@@ -1,5 +1,7 @@
 #!/bin/bash
-CTRLDIR="$( cd "$( dirname "$0" )" && cd .. && pwd -P )"
+
+CTRLDIR=~/run-cicd
+#CTRLDIR="$( cd "$( dirname "$0" )" && cd .. && pwd -P )"
 
 echo "************** RUN ALL ***************"
 echo ""
