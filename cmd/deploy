@@ -1,10 +1,6 @@
 #!/bin/bash
 
-if [ "${RUNCICD_PATH}" == "" ]; then 
-  CTRLDIR=~/run-cicd
-else
-  CTRLDIR=${RUNCICD_PATH}
-fi
+CTRLDIR=~/run-cicd
 
 echo ""
 echo "************* RUN DEPLOY service *****************"
@@ -61,6 +57,10 @@ echo "STEP1: Get Parameters"
 context=$1
 profile=$2
 basedir=$3
+
+if [ $# -eq 4 ]; then 
+  CTRLDIR=$4
+fi
 
 if [ "${context}" == "." ]; then
     context=`kubectl config current-context`

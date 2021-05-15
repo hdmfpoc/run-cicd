@@ -1,10 +1,6 @@
 #!/bin/bash
 
-if [ "${RUNCICD_PATH}" == "" ]; then 
-  CTRLDIR=~/run-cicd
-else
-  CTRLDIR=${RUNCICD_PATH}
-fi
+CTRLDIR=~/run-cicd
 
 configserver=""
 # get parameters
@@ -27,7 +23,6 @@ else
     read -p "# 개발언어(java/nodejs/react): " devlang
     read -p "# config server ingress name(해당없으면 ENTER): " configserver
 fi
-
 
 ${CTRLDIR}/cmd/run-all ${username} ${password} ${context} ${profile} ${basedir} ${devlang} ${configserver}
 exit 0

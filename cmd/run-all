@@ -1,10 +1,6 @@
 #!/bin/bash
 
-if [ "${RUNCICD_PATH}" == "" ]; then 
-  CTRLDIR=~/run-cicd
-else
-  CTRLDIR=${RUNCICD_PATH}
-fi
+CTRLDIR=~/run-cicd
 
 echo "************** RUN ALL ***************"
 echo ""
@@ -31,6 +27,10 @@ profile=$4
 basedir=$5
 devlang=$6
 configserver=$7
+if [ $# -eq 8 ]; then 
+  CTRLDIR=$8
+fi
+
 echo "configserver=>${configserver}"
 
 mkdir -p ${basedir}/deploy 2>/dev/null 
