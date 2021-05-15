@@ -1,7 +1,10 @@
 #!/bin/bash
 
-CTRLDIR=~/run-cicd
-#CTRLDIR="$( cd "$( dirname "$0" )" && cd .. && pwd -P )"
+if [ "${RUNCICD_PATH}" == ""]; then 
+  CTRLDIR=~/run-cicd
+else
+  CTRLDIR=${RUNCICD_PATH}
+fi
 
 echo ""
 echo "************* RUN DEPLOY service *****************"
