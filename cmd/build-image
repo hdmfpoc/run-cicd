@@ -2,8 +2,7 @@
 
 if [ "${RUNCICD_PATH}" == ""]; then 
   CTRLDIR=~/run-cicd
-else
-  
+else  
   CTRLDIR=${RUNCICD_PATH}
 fi
 
