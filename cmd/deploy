@@ -92,6 +92,7 @@ echo ""
 
 # set variables from config.properties: converted from '.' to '_'
 echo "STEP2. Set environment variables "
+
 if [ -f ${basedir}/deploy/cicd.properties ]; then
   eval $(${CTRLDIR}/cmd/set-env ${basedir}/deploy/cicd.properties)
 else
