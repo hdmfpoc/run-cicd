@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "${RUNCICD_PATH}" == ""]; then 
+if [ "${RUNCICD_PATH}" == "" ]; then 
   CTRLDIR=~/run-cicd
 else  
   CTRLDIR=${RUNCICD_PATH}
