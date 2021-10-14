@@ -10,7 +10,7 @@ fi
 
 user=$1
 
-grep ${user} /etc/passwd 2>/dev/null
+sudo grep ${user} /etc/passwd 2>/dev/null
 if [ $? -eq 0 ]; then
   echo "${user} is already exists"
 else
@@ -28,3 +28,4 @@ sudo chown -R ${user}:${user} /home/${user}/.kube
 echo "${user} is created successfully!"
 
 exit 0
+
