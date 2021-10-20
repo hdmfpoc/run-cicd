@@ -44,6 +44,5 @@ $ cd ~/run-cicd/cmd
 $ rm jq
 $ cp jq-mac jq
 ```
- 
 
 
