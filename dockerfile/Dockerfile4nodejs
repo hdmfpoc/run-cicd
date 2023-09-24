@@ -1,4 +1,4 @@
-FROM node:carbon
+FROM node:slim
 
 ARG MAIN_APP
 ENV APPNAME ${MAIN_APP}
@@ -14,7 +14,7 @@ WORKDIR ${ARTIFACTORY_HOME}
 
 COPY . ./
 
-RUN npm install
+#RUN npm install
 
 # RUN as docker user
 USER docker

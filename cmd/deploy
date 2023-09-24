@@ -124,7 +124,7 @@ echo ""
 # check current version
 echo "STEP4. Delete application if same version exists "
 
-CURTAG=$(kubectl get ${deploy_kind} ${image_repository} -n ${ns} -o yaml 2> /dev/null | grep "image: ${image_registry}/${image_project}/${image_repository}:" | cut -d ':' -f3)
+CURTAG=$(kubectl get ${deploy_kind} ${image_repository} -n ${ns} -o yaml 2> /dev/null | grep "image: ${image_registry}/${image_project}/${image_repository}:" | cut -d ':' -f4)
 if [ "${CURTAG}" == "" ]; then
   echo ">>> NO SAME VERSION EXISTS"
 else 
